@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TextInput } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Platform } from 'react-native';
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { getPlants } from '../utils/service';
@@ -9,6 +9,7 @@ const PlantSearchBar = ({ setPlantObject }) => {
   const [filteredPlants, setFilteredPlants] = useState([]);
   const [allPlants, setAllPlants] = useState(null);
   const [selectedPlant, setSelectedPlant] = useState(null);
+  const [plantName, setPlantName] = useState('');
 
   const data = async () => {
     try {
@@ -26,10 +27,11 @@ const PlantSearchBar = ({ setPlantObject }) => {
   const searchFilterFunction = (textInput) => {
     if (textInput) {
       const newData = allPlants.filter(function (item) {
-        const itemData = item.common[0] ? item.common[0].toLowerCase() : ''.toLowerCase();
+        const itemData = item.common[0]
+          ? item.common[0].toLowerCase()
+          : ''.toLowerCase();
         return itemData.indexOf(textInput.toLowerCase()) > -1;
       });
-      // console.log('filteredData', newData);
       setFilteredPlants(newData);
       setSearch(textInput);
     } else {
@@ -41,36 +43,62 @@ const PlantSearchBar = ({ setPlantObject }) => {
   return (
     <View style={styles.searchBarContainer}>
       {!allPlants ? (
-        <Text>Loading...</Text>
+        <Text>Loading Plant Database...</Text>
       ) : (
         <View>
-          <TextInput
+          {/* <TextInput
             style={styles.searchBar}
             onChangeText={(text) => searchFilterFunction(text)}
-            placeholder="Search plant by it's common name"
-            value={search}
-          />
-          <SelectDropdown
-            data={filteredPlants}
-            onSelect={(selectedItem) => {
-              setPlantObject(selectedItem);
-            }}
-            defaultButtonText={`Select plant (${filteredPlants.length})`}
-            buttonTextAfterSelection={(selectedItem) => {
-              setSelectedPlant(selectedItem);
-              return `Selected plant:`;
-            }}
-            rowTextForSelection={(item) => {
-              return item.common[0];
-            }}
-            // dropdownBackgroundColor="#009c97"
-            // style={styles.searchButton}
-          />
+            placeholder="Search plant by it's name"
+            value={plantName}
+          /> */}
+          <View style={styles.dropdownCont}>
+            <SelectDropdown
+              buttonStyle={styles.dropdown}
+              data={filteredPlants}
+              onSelect={(selectedItem) => {
+                setPlantObject(selectedItem);
+                setPlantName(selectedItem);
+              }}
+              defaultButtonText={`Select plant (${
+                filteredPlants ? filteredPlants.length : ''
+              })`}
+              buttonTextStyle={styles.buttonText}
+              buttonTextAfterSelection={(selectedItem) => {
+                setSelectedPlant(selectedItem);
+                return `Selected plant:`;
+              }}
+              rowTextForSelection={(item) => {
+                return item.common[0];
+              }}
+            />
+          </View>
           {selectedPlant && (
-            <View style={{ marginTop: 10 }}>
-              <Text style={styles.plantText}>Plant selected: {selectedPlant.common[0]}</Text>
-              <Text style={styles.plantText}>Family: {selectedPlant.family}</Text>
-              <Text style={styles.plantText}>Latin name: {selectedPlant.latin}</Text>
+            <View style={styles.newPlantCont}>
+              <Text style={styles.plantTextTitle}>Welcome to the family!</Text>
+              <Text style={styles.plantText}>
+                Your new Plant is a:{' '}
+                <Text style={styles.underline}>{selectedPlant.common[0]}</Text>
+              </Text>
+              <Text style={styles.plantText}>
+                ☀️ It's ideal Lighting is :{' '}
+                <Text style={styles.underline}>{selectedPlant.ideallight}</Text>
+              </Text>
+              <Text style={styles.plantText}>
+                🌱 It Belongs to the{' '}
+                <Text style={styles.underline}>{selectedPlant.category}</Text>{' '}
+                family
+              </Text>
+              <Text style={styles.plantText}>
+                🌡 It's happiest when the temperature is between{' '}
+                <Text style={styles.underline}>
+                  {selectedPlant.tempmax.celsius}°C
+                </Text>{' '}
+                and{' '}
+                <Text style={styles.underline}>
+                  {selectedPlant.tempmin.celsius}°C
+                </Text>
+              </Text>
             </View>
           )}
         </View>
@@ -82,20 +110,56 @@ const PlantSearchBar = ({ setPlantObject }) => {
 export default PlantSearchBar;
 
 const styles = StyleSheet.create({
-  plantText: {
+  plantTextTitle: {
     marginTop: 10,
-    fontFamily: 'Roboto',
-    fontSize: 15,
+    fontFamily: Platform.OS === 'ios' ? 'AppleSDGothicNeo-Thin' : 'Roboto',
+    fontSize: 20,
+    alignSelf: 'center',
+    fontWeight: 'bold',
+  },
+  plantText: {
+    marginTop: 17,
+    fontFamily: Platform.OS === 'ios' ? 'AppleSDGothicNeo-Thin' : 'Roboto',
+    fontSize: 18,
+    fontWeight: 'normal',
+  },
+  underline: {
+    textDecorationLine: 'underline',
+    textDecorationColor: '#009c97',
+  },
+  dropdownCont: {
+    alignItems: 'center',
+    borderRadius: 10,
+  },
+  dropdown: {
+    backgroundColor: '#009c97',
+    alignItems: 'center',
+    marginBottom: 10,
+    marginTop: 10,
+    borderRadius: 10,
+  },
+  buttonText: {
+    color: '#fff',
   },
   searchButton: {
     backgroundColor: '#009c97',
   },
+  newPlantCont: {
+    margin: 10,
+    alignItems: 'flex-start',
+    borderColor: '#009c97',
+    backgroundColor: '#fff',
+    borderWidth: 3,
+    borderRadius: 10,
+    padding: 10,
+  },
   searchBar: {
-    height: 40,
+    height: 50,
     margin: 12,
-    borderWidth: 1,
+    borderWidth: 3,
     borderColor: '#009c97',
     padding: 10,
+    backgroundColor: '#fff',
     borderRadius: 10,
     width: 300,
     textAlign: 'right',

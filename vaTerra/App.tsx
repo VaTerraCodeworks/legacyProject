@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import React from 'react';
 import HomeScreen from './screens/home.screen';
 import AddPlant from './screens/addPlant.screen';
@@ -11,12 +11,11 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as Notifications from 'expo-notifications';
 import { useEffect, useState } from 'react';
-
 import { getUser } from './utils/service';
-// import { LogBox } from 'react-native';
+import { LogBox } from 'react-native';
 
 const Tab = createMaterialBottomTabNavigator();
-// console.disableYellowBox = true;1
+LogBox.ignoreAllLogs();
 
 // const registerForPushNotificationsAsync = async function () {
 //   let token;
@@ -50,7 +49,7 @@ export default function App() {
       const user = await getUser(1);
       setUser(user);
     } catch (error) {
-      console.log('first ConnectionTest', error);
+      console.log('first ConnectionTest error:', error);
     }
   };
 
@@ -58,14 +57,15 @@ export default function App() {
     checkConnection();
   }, []);
 
-  console.log('user', user);
-
   return (
     <SafeAreaProvider>
       <NavigationContainer>
         <Tab.Navigator
           labeled={false}
-          barStyle={{ backgroundColor: '#009c97', height: 60 }}
+          barStyle={{
+            backgroundColor: '#009c97',
+            height: Platform.OS === 'ios' ? 80 : 50,
+          }}
           activeColor="white"
         >
           <>
@@ -73,7 +73,7 @@ export default function App() {
               name="Home"
               component={!user ? Loading : HomeScreen}
               options={{
-                unmountOnBlur: true,
+                // unmountOnBlur: true, //<- this is not working
                 tabBarIcon: () => {
                   return (
                     <MaterialCommunityIcons
@@ -90,9 +90,12 @@ export default function App() {
               component={!user ? Loading : AddPlant}
               options={{
                 tabBarIcon: () => {
-                  console.log('something is clicked');
                   return (
-                    <MaterialCommunityIcons name="plus" size={30} color={'rgb(243,242,238)'} />
+                    <MaterialCommunityIcons
+                      name="plus"
+                      size={30}
+                      color={'rgb(243,242,238)'}
+                    />
                   );
                 },
               }}
@@ -103,7 +106,11 @@ export default function App() {
               options={{
                 tabBarIcon: () => {
                   return (
-                    <MaterialCommunityIcons name="water" size={28} color={'rgb(243,242,238)'} />
+                    <MaterialCommunityIcons
+                      name="water"
+                      size={28}
+                      color={'rgb(243,242,238)'}
+                    />
                   );
                 },
               }}

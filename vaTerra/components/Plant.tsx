@@ -1,9 +1,7 @@
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, Platform } from 'react-native';
 import React from 'react';
 
 const Plant = ({ plant }) => {
-  // console.log('Plant()');
-
   return (
     <View style={styles.plantContainer}>
       <Image
@@ -18,7 +16,9 @@ const styles = StyleSheet.create({
   plantImage: {
     width: 150,
     height: 200,
-    borderRadius: 90,
+    borderRadius: 20,
+    borderColor: '#009c97',
+    borderWidth: 3,
   },
   plantContainer: {
     padding: 10,
@@ -28,9 +28,10 @@ const styles = StyleSheet.create({
   },
   plantText: {
     marginTop: 10,
-    fontFamily: 'Roboto',
+    fontFamily: Platform.OS === 'ios' ? 'AppleSDGothicNeo-Thin' : 'Roboto',
     fontSize: 16,
     letterSpacing: 1.5,
+    fontWeight: '500',
   },
 });
 

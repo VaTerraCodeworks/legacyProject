@@ -1,20 +1,20 @@
-import { StyleSheet, Text, View, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, Platform } from 'react-native';
 import React, { useEffect } from 'react';
 import Plant from './Plant';
 import { useState } from 'react';
 import { getPlants, getUser } from '../utils/service';
 
-const Hibernacle = (props) => {
+const Hibernacle = ({ refreshing }) => {
   const [plants, setPlants] = useState([]);
   const [user, setUser] = useState(null);
 
   const getData = async () => {
     try {
       const data = await getUser(1);
-      console.log('GetUserData', data);
+      // console.log('GetUserData', data);
       setUser(data);
-      console.log('UserSet:', user);
-      // setPlants(data.plantsArray);
+      // console.log('UserSet:', user);
+      setPlants(data.plants);
     } catch (error) {
       console.log('Error get Data:', error);
     }
@@ -31,13 +31,14 @@ const Hibernacle = (props) => {
           <Text style={styles.text}>HIBERNACLE</Text>
         </View>
         <View>
-          <Text style={styles.text}>{user ? user.userEmail : ''}</Text>
+          <Text style={styles.text}>
+            Hello {user ? user.userName : 'Guest'}!
+          </Text>
         </View>
-
         <View style={styles.hibernacleWrapper}>
-          {/* {plants.map((element, index) => (
+          {plants.map((element, index) => (
             <Plant plant={element} key={index} />
-          ))} */}
+          ))}
         </View>
       </View>
     </ScrollView>
@@ -48,19 +49,19 @@ export default Hibernacle;
 
 const styles = StyleSheet.create({
   text: {
-    marginTop: 10,
+    marginTop: Platform.OS === 'ios' ? 10 : 0,
     fontSize: 23,
     fontWeight: 'bold',
-    fontFamily: 'Roboto',
+    fontFamily: Platform.OS === 'ios' ? 'AppleSDGothicNeo-Thin' : 'Roboto',
     color: '#009c97',
-    letterSpacing: 8,
+    letterSpacing: 3,
   },
   hibernacleContainer: {
-    marginTop: 45,
     flex: 1,
     width: 395,
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: Platform.OS === 'android' ? 60 : 0,
   },
   hibernacleWrapper: {
     flex: 1,
